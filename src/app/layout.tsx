@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { EB_Garamond } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './theme-provider'
+import NavBar from '@/components/NavBar'
+import Background from '@/components/Background'
 
 const ebGaramondSans = EB_Garamond({
-  subsets: ["latin"],
-});
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -20,10 +22,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={ebGaramondSans.className}>
-        <div className="noise-gradient"/>
-        <ThemeProvider attribute="class" disableTransitionOnChange>
-          {children}
+        <Background />
+        <ThemeProvider defaultTheme="dark" attribute="class">
+          {/* Add pointer-events-none to the navbar container but keep the navbar itself interactive */}
+          <div className="pointer-events-none relative z-10">
+            <div className="pointer-events-auto flex flex-row justify-end">
+              <NavBar />
+            </div>
+          </div>
+
+          {/* Main content container with pointer-events-none */}
+          <div className="pointer-events-none relative z-10">{children}</div>
         </ThemeProvider>
+        <div className="noise-gradient"></div>
       </body>
     </html>
   )

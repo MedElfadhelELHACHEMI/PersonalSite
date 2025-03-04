@@ -1,6 +1,9 @@
-export default function Marquee({ items }: { items: string[] }) {
+import {cn} from "@/lib/utils";
+
+export default function Marquee({ items,className }: { items: string[],className?: string }) {
+
   return (
-    <div className="relative flex w-full overflow-x-hidden border-b-2 border-t-2 border-border dark:border-darkBorder bg-white dark:bg-secondaryBlack text-text dark:text-darkText font-base">
+    <div className={cn("relative flex w-full overflow-x-hidden border-b-2 border-t-2 border-border dark:border-darkBorder bg-white dark:bg-secondaryBlack text-text dark:text-darkText font-base",className)}>
       <div className="animate-marquee whitespace-nowrap py-12">
         {items.map((item) => {
           return (

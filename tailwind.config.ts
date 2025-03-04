@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type {Config} from 'tailwindcss'
 
 const config: Config = {
   content: [
@@ -58,6 +58,9 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+		container: {
+			center: true,
+		},
   		borderRadius: {
   			base: '4px',
   			lg: 'var(--radius)',
@@ -79,8 +82,8 @@ const config: Config = {
   			heading: '700'
   		},
   		animation: {
-  			marquee: 'marquee 5s linear infinite',
-  			marquee2: 'marquee2 5s linear infinite'
+  			marquee: 'marquee 33s linear infinite',
+  			marquee2: 'marquee2 33s linear infinite'
   		},
   		keyframes: {
   			marquee: {

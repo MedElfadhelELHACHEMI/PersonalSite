@@ -31,8 +31,6 @@ body::-webkit-scrollbar-thumb {
   }
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -89,8 +87,6 @@ body::-webkit-scrollbar-thumb {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -100,8 +96,12 @@ body::-webkit-scrollbar-thumb {
   }
 }
 body {
-  background-image: radial-gradient(rgba(128, 128, 128, 0.5) 1px, rgba(0, 0, 0, 0) 0px);
+  background-image: radial-gradient(
+    rgba(128, 128, 128, 0.5) 1px,
+    rgba(0, 0, 0, 0) 0px
+  );
   background-size: 16px 16px;
+  padding: 32px;
 }
 .noise-gradient {
   position: fixed;
@@ -110,6 +110,6 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  background: url("../../public/noise.png");
+  background: url('../../public/noise.png');
   opacity: 0.3;
 }
