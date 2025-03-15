@@ -688,11 +688,23 @@ const Background: React.FC = () => {
     setStartDot(null)
     setCoveredDots(new Set())
 
+    // Clear animation paths from SVG
+    if (svgRef.current) {
+      const existingPaths = svgRef.current.querySelectorAll(
+        '[data-anim-path="true"]',
+      )
+      existingPaths.forEach((path) => path.remove())
+    }
+
+    // Reset refs
     currentPathRef.current = null
     currentPointsRef.current = []
     startDotRef.current = null
     isDrawingRef.current = false
-  }, [setPaths, setCurrentPath, setCurrentPoints, setStartDot, setCoveredDots])
+
+    // Keep animation complete as true to prevent restart
+    setAnimationComplete(true)
+  }, [])
 
   // Handle keyboard shortcut
   useEffect(() => {
