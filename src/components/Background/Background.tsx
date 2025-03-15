@@ -1,5 +1,6 @@
 'use client'
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTheme } from 'next-themes'
 
 // Define TypeScript interfaces
 interface Point {
@@ -43,6 +44,8 @@ const throttle = (func: Function, delay: number) => {
 }
 
 const Background: React.FC = () => {
+  const { theme } = useTheme()
+
   // Refs for better performance
   const svgRef = useRef<SVGSVGElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -52,7 +55,7 @@ const Background: React.FC = () => {
   const currentPointsRef = useRef<Point[]>([])
   const startDotRef = useRef<Point | null>(null)
   const lastTimeRef = useRef<number>(0)
-  
+
   // State
   const [dimensions, setDimensions] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1000,
@@ -65,7 +68,9 @@ const Background: React.FC = () => {
   const [startDot, setStartDot] = useState<Point | null>(null)
   const [coveredDots, setCoveredDots] = useState<Set<string>>(new Set())
   const [animationComplete, setAnimationComplete] = useState(false)
-  const [animationSegments, setAnimationSegments] = useState<AnimationSegment[]>([])
+  const [animationSegments, setAnimationSegments] = useState<
+    AnimationSegment[]
+  >([])
   const [viewport, setViewport] = useState<ViewportRect>({
     top: 0,
     left: 0,
@@ -91,12 +96,6 @@ const Background: React.FC = () => {
     [],
   )
 
-  // Pencil cursor SVG as a data URL
-  const pencilCursor = useMemo(() => 
-    `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`,
-    []
-  )
-
   // Colors array for user drawing using the custom colors
   const colors = useMemo(
     () => [
@@ -116,7 +115,7 @@ const Background: React.FC = () => {
   // Generate virtualized dot grid data - only dots in or near the viewport
   const dotGrid = useMemo(() => {
     const grid: Point[] = []
-    
+
     // Calculate the range of rows and columns that are visible in the viewport
     const extendedViewport = {
       top: Math.max(0, viewport.top - viewportMargin),
@@ -124,12 +123,12 @@ const Background: React.FC = () => {
       bottom: Math.min(dimensions.height, viewport.bottom + viewportMargin),
       right: Math.min(dimensions.width, viewport.right + viewportMargin),
     }
-    
+
     const startRow = Math.floor(extendedViewport.top / dotSpacing)
     const endRow = Math.ceil(extendedViewport.bottom / dotSpacing)
     const startCol = Math.floor(extendedViewport.left / dotSpacing)
     const endCol = Math.ceil(extendedViewport.right / dotSpacing)
-    
+
     // Only generate dots within this range
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
@@ -151,7 +150,7 @@ const Background: React.FC = () => {
       const id = `dot-${row}-${col}`
       return { x, y, row, col, id }
     },
-    [dotSpacing]
+    [dotSpacing],
   )
 
   // Generate a path with rounded corners
@@ -166,7 +165,7 @@ const Background: React.FC = () => {
           const prev = points[i - 1]
           const current = points[i]
           const next = points[i + 1]
-          
+
           if (!prev || !current || !next) continue
 
           // Check if this is a corner (direction change)
@@ -213,18 +212,22 @@ const Background: React.FC = () => {
         // Faster calculation using grid position directly
         const closestCol = Math.round((x - dotSpacing / 2) / dotSpacing)
         const closestRow = Math.round((y - dotSpacing / 2) / dotSpacing)
-        
+
         // Determine if we should snap horizontally or vertically based on distance
-        const horizontalDistance = Math.abs(x - (closestCol * dotSpacing + dotSpacing / 2))
-        const verticalDistance = Math.abs(y - (closestRow * dotSpacing + dotSpacing / 2))
+        const horizontalDistance = Math.abs(
+          x - (closestCol * dotSpacing + dotSpacing / 2),
+        )
+        const verticalDistance = Math.abs(
+          y - (closestRow * dotSpacing + dotSpacing / 2),
+        )
         const isHorizontalCloser = horizontalDistance < verticalDistance
-        
+
         // Prevent out of bounds
         const maxCol = Math.floor(dimensions.width / dotSpacing)
         const maxRow = Math.floor(dimensions.height / dotSpacing)
         const boundedCol = Math.max(0, Math.min(closestCol, maxCol))
         const boundedRow = Math.max(0, Math.min(closestRow, maxRow))
-        
+
         // Get the dot directly without searching the array
         if (isHorizontalCloser) {
           // Snap to the same row as startDot, but change column
@@ -238,7 +241,7 @@ const Background: React.FC = () => {
         return null
       }
     },
-    [dimensions, dotSpacing, getDotAt]
+    [dimensions, dotSpacing, getDotAt],
   )
 
   // Create abstract line animation paths
@@ -262,16 +265,32 @@ const Background: React.FC = () => {
       // Helper function to get a dot from the central area - more efficient implementation
       const getCentralDot = (): Point => {
         // Calculate a central dot directly
-        const centerCol = Math.floor((width / 2) / dotSpacing)
-        const centerRow = Math.floor((height / 2) / dotSpacing)
-        
+        const centerCol = Math.floor(width / 2 / dotSpacing)
+        const centerRow = Math.floor(height / 2 / dotSpacing)
+
         // Add some randomization around the center
-        const randomOffsetCol = Math.floor(Math.random() * (width / 6 / dotSpacing)) - Math.floor(width / 12 / dotSpacing)
-        const randomOffsetRow = Math.floor(Math.random() * (height / 6 / dotSpacing)) - Math.floor(height / 12 / dotSpacing)
-        
-        const col = Math.max(0, Math.min(centerCol + randomOffsetCol, Math.floor(width / dotSpacing) - 1))
-        const row = Math.max(0, Math.min(centerRow + randomOffsetRow, Math.floor(height / dotSpacing) - 1))
-        
+        const randomOffsetCol =
+          Math.floor(Math.random() * (width / 6 / dotSpacing)) -
+          Math.floor(width / 12 / dotSpacing)
+        const randomOffsetRow =
+          Math.floor(Math.random() * (height / 6 / dotSpacing)) -
+          Math.floor(height / 12 / dotSpacing)
+
+        const col = Math.max(
+          0,
+          Math.min(
+            centerCol + randomOffsetCol,
+            Math.floor(width / dotSpacing) - 1,
+          ),
+        )
+        const row = Math.max(
+          0,
+          Math.min(
+            centerRow + randomOffsetRow,
+            Math.floor(height / dotSpacing) - 1,
+          ),
+        )
+
         return getDotAt(row, col)
       }
 
@@ -280,12 +299,12 @@ const Background: React.FC = () => {
         const startDot = getCentralDot()
         const points: Point[] = [startDot]
         const segmentCount = Math.floor(Math.random() * 4) + 4 // 4-7 segments
-        
+
         let currentPoint = startDot
         for (let j = 0; j < segmentCount; j++) {
           const isHorizontal = j % 2 === 0
           const segmentLength = Math.floor(Math.random() * 7) + 5
-          
+
           // Direction logic for first segments
           let direction = 1
           if (j < 2) {
@@ -346,16 +365,16 @@ const Background: React.FC = () => {
     try {
       const canvas = canvasRef.current
       if (!canvas) return
-      
+
       const ctx = canvas.getContext('2d')
       if (!ctx) return
-      
+
       // Clear the canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       // Set dot style
       ctx.fillStyle = '#666'
-      
+
       // Draw only dots that aren't covered
       for (const dot of dotGrid) {
         if (!coveredDots.has(dot.id)) {
@@ -372,77 +391,87 @@ const Background: React.FC = () => {
   // Initial animation with requestAnimationFrame
   const runInitialAnimation = useCallback(() => {
     if (animationSegments.length === 0 || animationComplete) return
-    
+
     const totalDuration = 5000 // 5 seconds for full animation
-    
+
     const easeInOutQuart = (t: number) => {
       return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2
     }
-    
+
     const animate = (timestamp: number) => {
       try {
         if (!lastTimeRef.current) {
           lastTimeRef.current = timestamp
         }
-        
+
         const elapsed = timestamp - lastTimeRef.current
         const rawProgress = Math.min(elapsed / totalDuration, 1)
         const easedProgress = easeInOutQuart(rawProgress)
-        
+
         // Calculate visible segments
         const totalSegments = animationSegments.length
         const segmentsToShow = Math.ceil(totalSegments * easedProgress)
-        
+
         // Update SVG element
         if (svgRef.current) {
           // Remove existing animation paths
-          const existingPaths = svgRef.current.querySelectorAll('[data-anim-path="true"]')
-          existingPaths.forEach(path => path.remove())
-          
+          const existingPaths = svgRef.current.querySelectorAll(
+            '[data-anim-path="true"]',
+          )
+          existingPaths.forEach((path) => path.remove())
+
           // Create new animation paths
-          animationSegments.slice(0, segmentsToShow).forEach((segment, index) => {
-            if (index < segmentsToShow - 1) {
-              // Show this segment fully
-              const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-              path.setAttribute('data-anim-path', 'true')
-              path.setAttribute('d', generatePathFromPoints(segment.points))
-              path.setAttribute('stroke', segment.color || '#666')
-              path.setAttribute('stroke-width', String(lineWidth))
-              path.setAttribute('stroke-linecap', 'round')
-              path.setAttribute('stroke-linejoin', 'round')
-              path.setAttribute('fill', 'none')
-              path.setAttribute('stroke-opacity', '0.8')
-              svgRef.current?.appendChild(path)
-            } else {
-              // This is the currently animating segment
-              const segmentProgress = (easedProgress * totalSegments) % 1
-              const pointsToShow = Math.max(
-                2,
-                Math.floor(segment.points.length * segmentProgress)
-              )
-              const visiblePoints = segment.points.slice(0, pointsToShow)
-              
-              const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-              path.setAttribute('data-anim-path', 'true')
-              path.setAttribute('d', generatePathFromPoints(visiblePoints))
-              path.setAttribute('stroke', segment.color || '#666')
-              path.setAttribute('stroke-width', String(lineWidth))
-              path.setAttribute('stroke-linecap', 'round')
-              path.setAttribute('stroke-linejoin', 'round')
-              path.setAttribute('fill', 'none')
-              path.setAttribute('stroke-opacity', '0.8')
-              svgRef?.current?.appendChild(path)
-            }
-          })
+          animationSegments
+            .slice(0, segmentsToShow)
+            .forEach((segment, index) => {
+              if (index < segmentsToShow - 1) {
+                // Show this segment fully
+                const path = document.createElementNS(
+                  'http://www.w3.org/2000/svg',
+                  'path',
+                )
+                path.setAttribute('data-anim-path', 'true')
+                path.setAttribute('d', generatePathFromPoints(segment.points))
+                path.setAttribute('stroke', segment.color || '#666')
+                path.setAttribute('stroke-width', String(lineWidth))
+                path.setAttribute('stroke-linecap', 'round')
+                path.setAttribute('stroke-linejoin', 'round')
+                path.setAttribute('fill', 'none')
+                path.setAttribute('stroke-opacity', '0.8')
+                svgRef.current?.appendChild(path)
+              } else {
+                // This is the currently animating segment
+                const segmentProgress = (easedProgress * totalSegments) % 1
+                const pointsToShow = Math.max(
+                  2,
+                  Math.floor(segment.points.length * segmentProgress),
+                )
+                const visiblePoints = segment.points.slice(0, pointsToShow)
+
+                const path = document.createElementNS(
+                  'http://www.w3.org/2000/svg',
+                  'path',
+                )
+                path.setAttribute('data-anim-path', 'true')
+                path.setAttribute('d', generatePathFromPoints(visiblePoints))
+                path.setAttribute('stroke', segment.color || '#666')
+                path.setAttribute('stroke-width', String(lineWidth))
+                path.setAttribute('stroke-linecap', 'round')
+                path.setAttribute('stroke-linejoin', 'round')
+                path.setAttribute('fill', 'none')
+                path.setAttribute('stroke-opacity', '0.8')
+                svgRef?.current?.appendChild(path)
+              }
+            })
         }
-        
+
         // Continue animation or finish
         if (rawProgress < 1) {
           animationFrameRef.current = requestAnimationFrame(animate)
         } else {
           // Animation complete
           setAnimationComplete(true)
-          
+
           // Add the animation paths to the paths list
           const animationPaths: PathData[] = animationSegments.map(
             (segment, index) => {
@@ -454,12 +483,12 @@ const Background: React.FC = () => {
                 d: path,
                 points: segment.points,
               }
-            }
+            },
           )
-          
+
           // Batch state updates
-          setPaths(prev => [...prev, ...animationPaths])
-          
+          setPaths((prev) => [...prev, ...animationPaths])
+
           // Mark dots as covered
           const covered = new Set<string>()
           animationSegments.forEach((segment) => {
@@ -467,10 +496,10 @@ const Background: React.FC = () => {
               covered.add(point.id)
             })
           })
-          
-          setCoveredDots(prev => {
+
+          setCoveredDots((prev) => {
             const newCovered = new Set(prev)
-            covered.forEach(id => newCovered.add(id))
+            covered.forEach((id) => newCovered.add(id))
             return newCovered
           })
         }
@@ -479,19 +508,31 @@ const Background: React.FC = () => {
         setAnimationComplete(true) // Ensure we don't get stuck
       }
     }
-    
+
     animationFrameRef.current = requestAnimationFrame(animate)
-    
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [animationSegments, animationComplete, generatePathFromPoints, lineWidth, setAnimationComplete, setPaths, setCoveredDots])
+  }, [
+    animationSegments,
+    animationComplete,
+    generatePathFromPoints,
+    lineWidth,
+    setAnimationComplete,
+    setPaths,
+    setCoveredDots,
+  ])
 
   // Set up animation segments
   useEffect(() => {
-    if (!animationComplete && dotGrid.length > 0 && animationSegments.length === 0) {
+    if (
+      !animationComplete &&
+      dotGrid.length > 0 &&
+      animationSegments.length === 0
+    ) {
       try {
         const segments = createAnimationSegments()
         if (segments && segments.length > 0) {
@@ -502,7 +543,14 @@ const Background: React.FC = () => {
         setAnimationComplete(true) // Prevent infinite loop on error
       }
     }
-  }, [dotGrid.length, animationComplete, createAnimationSegments, animationSegments.length, setAnimationSegments, setAnimationComplete])
+  }, [
+    dotGrid.length,
+    animationComplete,
+    createAnimationSegments,
+    animationSegments.length,
+    setAnimationSegments,
+    setAnimationComplete,
+  ])
 
   // Start animation when segments are ready
   useEffect(() => {
@@ -519,9 +567,9 @@ const Background: React.FC = () => {
   // Handle window resize with debounce and update viewport
   useEffect(() => {
     if (typeof window === 'undefined') return
-    
+
     let resizeTimeoutId: NodeJS.Timeout
-    
+
     const handleResize = () => {
       clearTimeout(resizeTimeoutId)
       resizeTimeoutId = setTimeout(() => {
@@ -535,7 +583,7 @@ const Background: React.FC = () => {
           bottom: window.scrollY + window.innerHeight,
           right: window.scrollX + window.innerWidth,
         })
-        
+
         // Update canvas size
         if (canvasRef.current) {
           canvasRef.current.width = window.innerWidth
@@ -544,15 +592,15 @@ const Background: React.FC = () => {
         }
       }, 100) // Debounce resize events
     }
-    
+
     window.addEventListener('resize', handleResize)
-    
+
     // Initialize canvas size
     if (canvasRef.current) {
       canvasRef.current.width = window.innerWidth
       canvasRef.current.height = window.innerHeight
     }
-    
+
     return () => {
       window.removeEventListener('resize', handleResize)
       clearTimeout(resizeTimeoutId)
@@ -562,7 +610,7 @@ const Background: React.FC = () => {
   // Handle scroll events to update viewport
   useEffect(() => {
     if (typeof window === 'undefined') return
-    
+
     const handleScroll = throttle(() => {
       setViewport({
         top: window.scrollY,
@@ -571,11 +619,11 @@ const Background: React.FC = () => {
         right: window.scrollX + window.innerWidth,
       })
     }, 100) // Throttle to every 100ms
-    
+
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-  
+
   // Update covered dots when a new path is added
   useEffect(() => {
     if (paths.length === 0) {
@@ -602,7 +650,7 @@ const Background: React.FC = () => {
       for (let i = 0; i < latestPath.points.length - 1; i++) {
         const currentPoint = latestPath.points[i]
         const nextPoint = latestPath.points[i + 1]
-        
+
         if (!currentPoint || !nextPoint) continue
 
         // For horizontal segments
@@ -639,7 +687,7 @@ const Background: React.FC = () => {
     setCurrentPoints([])
     setStartDot(null)
     setCoveredDots(new Set())
-    
+
     currentPathRef.current = null
     currentPointsRef.current = []
     startDotRef.current = null
@@ -661,23 +709,31 @@ const Background: React.FC = () => {
   // Throttled mouse move handler to reduce render cycles
   const handleThrottledMouseMove = useCallback(
     throttle((x: number, y: number) => {
-      if (!isDrawingRef.current || !startDotRef.current || currentPointsRef.current.length === 0) {
+      if (
+        !isDrawingRef.current ||
+        !startDotRef.current ||
+        currentPointsRef.current.length === 0
+      ) {
         return
       }
-      
+
       try {
-        const lastPoint = currentPointsRef.current[currentPointsRef.current.length - 1]
+        const lastPoint =
+          currentPointsRef.current[currentPointsRef.current.length - 1]
         const nearestDot = findNearestDotGridAligned(x, y, lastPoint)
-        
-        if (nearestDot && (nearestDot.x !== lastPoint.x || nearestDot.y !== lastPoint.y)) {
+
+        if (
+          nearestDot &&
+          (nearestDot.x !== lastPoint.x || nearestDot.y !== lastPoint.y)
+        ) {
           const newPoints = [...currentPointsRef.current, nearestDot]
-          
+
           // Update refs for performance
           currentPointsRef.current = newPoints
-          
+
           // Generate new path with rounded corners
           const pathData = generatePathFromPoints(newPoints)
-          
+
           if (currentPathRef.current) {
             currentPathRef.current = {
               ...currentPathRef.current,
@@ -685,30 +741,30 @@ const Background: React.FC = () => {
               points: newPoints,
             }
           }
-          
+
           // Batch state updates
           setCurrentPoints(newPoints)
-          setCurrentPath(prev =>
+          setCurrentPath((prev) =>
             prev
               ? {
                   ...prev,
                   d: pathData,
                   points: newPoints,
                 }
-              : null
+              : null,
           )
-          
+
           // Mark the dot as covered
-          setCoveredDots(prev => {
+          setCoveredDots((prev) => {
             const newSet = new Set(prev)
             newSet.add(nearestDot.id)
-            
+
             // Also mark dots between the last point and current point as covered
             if (lastPoint.row === nearestDot.row) {
               // Horizontal line
               const minCol = Math.min(lastPoint.col, nearestDot.col)
               const maxCol = Math.max(lastPoint.col, nearestDot.col)
-              
+
               for (let col = minCol; col <= maxCol; col++) {
                 newSet.add(`dot-${lastPoint.row}-${col}`)
               }
@@ -716,12 +772,12 @@ const Background: React.FC = () => {
               // Vertical line
               const minRow = Math.min(lastPoint.row, nearestDot.row)
               const maxRow = Math.max(lastPoint.row, nearestDot.row)
-              
+
               for (let row = minRow; row <= maxRow; row++) {
                 newSet.add(`dot-${row}-${lastPoint.col}`)
               }
             }
-            
+
             return newSet
           })
         }
@@ -729,7 +785,13 @@ const Background: React.FC = () => {
         console.error('Error in throttled mouse move:', error)
       }
     }, 16), // Throttle to ~60fps
-    [findNearestDotGridAligned, generatePathFromPoints, setCurrentPoints, setCurrentPath, setCoveredDots]
+    [
+      findNearestDotGridAligned,
+      generatePathFromPoints,
+      setCurrentPoints,
+      setCurrentPath,
+      setCoveredDots,
+    ],
   )
 
   // Handle mouse events for drawing
@@ -745,26 +807,26 @@ const Background: React.FC = () => {
         // Find the nearest dot via direct grid calculation
         const col = Math.round((x - dotSpacing / 2) / dotSpacing)
         const row = Math.round((y - dotSpacing / 2) / dotSpacing)
-        
+
         // Ensure within bounds
         const maxCol = Math.floor(dimensions.width / dotSpacing)
         const maxRow = Math.floor(dimensions.height / dotSpacing)
-        
+
         if (col < 0 || col > maxCol || row < 0 || row > maxRow) {
           return
         }
-        
+
         const nearestDot = getDotAt(row, col)
 
         if (nearestDot) {
           // Generate a random color for this new path
           const newColor = getRandomColor()
-          
+
           // Update refs for performance
           isDrawingRef.current = true
           startDotRef.current = nearestDot
           currentPointsRef.current = [nearestDot]
-          
+
           const newPath = {
             id: `path-${Date.now()}`,
             color: newColor,
@@ -772,7 +834,7 @@ const Background: React.FC = () => {
             d: `M ${nearestDot.x} ${nearestDot.y}`,
             points: [nearestDot],
           }
-          
+
           currentPathRef.current = newPath
 
           // Update state
@@ -792,31 +854,42 @@ const Background: React.FC = () => {
         console.error('Error in mouse down:', error)
       }
     },
-    [dimensions, dotSpacing, getRandomColor, lineWidth, getDotAt, setIsDrawing, setStartDot, setCurrentPoints, setCurrentPath, setCoveredDots]
+    [
+      dimensions,
+      dotSpacing,
+      getRandomColor,
+      lineWidth,
+      getDotAt,
+      setIsDrawing,
+      setStartDot,
+      setCurrentPoints,
+      setCurrentPath,
+      setCoveredDots,
+    ],
   )
 
   // Handle document-wide mouse move
   const handleDocumentMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!svgRef.current || !isDrawingRef.current) return
-      
+
       try {
         const rect = svgRef.current.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
-        
+
         handleThrottledMouseMove(x, y)
       } catch (error) {
         console.error('Error in document mouse move:', error)
       }
     },
-    [handleThrottledMouseMove]
+    [handleThrottledMouseMove],
   )
 
   // Handle document-wide mouse up
   const handleDocumentMouseUp = useCallback(() => {
     if (!isDrawingRef.current || !currentPathRef.current) return
-    
+
     try {
       if (currentPointsRef.current.length > 1) {
         // Add the current path to the paths list
@@ -824,25 +897,25 @@ const Background: React.FC = () => {
           ...currentPathRef.current,
           // Ensure valid data
           d: currentPathRef.current.d || '',
-          points: [...currentPointsRef.current]
+          points: [...currentPointsRef.current],
         }
-        
+
         setPaths((prev) => [...prev, finalPath])
       }
-      
+
       // Reset state and refs
       isDrawingRef.current = false
       currentPathRef.current = null
       currentPointsRef.current = []
       startDotRef.current = null
-      
+
       setIsDrawing(false)
       setCurrentPath(null)
       setCurrentPoints([])
       setStartDot(null)
     } catch (error) {
       console.error('Error in document mouse up:', error)
-      
+
       // Reset state even on error
       setIsDrawing(false)
       setCurrentPath(null)
@@ -870,26 +943,26 @@ const Background: React.FC = () => {
         // Find the nearest dot via direct grid calculation
         const col = Math.round((x - dotSpacing / 2) / dotSpacing)
         const row = Math.round((y - dotSpacing / 2) / dotSpacing)
-        
+
         // Ensure within bounds
         const maxCol = Math.floor(dimensions.width / dotSpacing)
         const maxRow = Math.floor(dimensions.height / dotSpacing)
-        
+
         if (col < 0 || col > maxCol || row < 0 || row > maxRow) {
           return
         }
-        
+
         const nearestDot = getDotAt(row, col)
 
         if (nearestDot) {
           // Generate a random color for this new path
           const newColor = getRandomColor()
-          
+
           // Update refs
           isDrawingRef.current = true
           startDotRef.current = nearestDot
           currentPointsRef.current = [nearestDot]
-          
+
           const newPath = {
             id: `path-${Date.now()}`,
             color: newColor,
@@ -897,7 +970,7 @@ const Background: React.FC = () => {
             d: `M ${nearestDot.x} ${nearestDot.y}`,
             points: [nearestDot],
           }
-          
+
           currentPathRef.current = newPath
 
           // Update state
@@ -917,7 +990,18 @@ const Background: React.FC = () => {
         console.error('Error in document mouse down:', error)
       }
     },
-    [dimensions, dotSpacing, getRandomColor, lineWidth, getDotAt, setIsDrawing, setStartDot, setCurrentPoints, setCurrentPath, setCoveredDots]
+    [
+      dimensions,
+      dotSpacing,
+      getRandomColor,
+      lineWidth,
+      getDotAt,
+      setIsDrawing,
+      setStartDot,
+      setCurrentPoints,
+      setCurrentPath,
+      setCoveredDots,
+    ],
   )
 
   // Setup document-wide mouse event listeners
@@ -947,24 +1031,24 @@ const Background: React.FC = () => {
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       if (!svgRef.current || !isDrawingRef.current) return
-      
+
       try {
         const rect = svgRef.current.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
-        
+
         handleThrottledMouseMove(x, y)
       } catch (error) {
         console.error('Error in SVG mouse move:', error)
       }
     },
-    [handleThrottledMouseMove]
+    [handleThrottledMouseMove],
   )
 
   // Direct SVG mouse up handler
   const handleMouseUp = useCallback(() => {
     if (!isDrawingRef.current || !currentPathRef.current) return
-    
+
     try {
       if (currentPointsRef.current.length > 1) {
         // Add the current path to the paths list
@@ -972,26 +1056,26 @@ const Background: React.FC = () => {
           ...currentPathRef.current,
           // Ensure valid data
           d: currentPathRef.current.d || '',
-          points: [...currentPointsRef.current]
+          points: [...currentPointsRef.current],
         }
-        
+
         setPaths((prev) => [...prev, finalPath])
       }
-      
+
       // Reset refs
       isDrawingRef.current = false
       currentPathRef.current = null
       currentPointsRef.current = []
       startDotRef.current = null
-      
-      // Reset state 
+
+      // Reset state
       setIsDrawing(false)
       setCurrentPath(null)
       setCurrentPoints([])
       setStartDot(null)
     } catch (error) {
       console.error('Error in mouse up:', error)
-      
+
       // Reset state even on error
       setIsDrawing(false)
       setCurrentPath(null)
@@ -1005,13 +1089,13 @@ const Background: React.FC = () => {
     // handleMouseUp will be called by document mouseup event
   }, [])
 
-  // Custom cursor CSS style
+  // Custom cursor CSS style with theme support
   const cursorStyle = useMemo(
     () => ({
-      cursor: `url("${pencilCursor}") 0 24, auto`,
-      backgroundColor: 'rgb(33, 33, 33)',
+      backgroundColor: theme === 'light' ? '#EDEADE' : 'rgb(33, 33, 33)',
+      transition: 'background-color 0.62s ease',
     }),
-    [pencilCursor],
+    [theme],
   )
 
   // Check if a dot is covered by a line
@@ -1033,15 +1117,15 @@ const Background: React.FC = () => {
         ref={canvasRef}
         width={dimensions.width}
         height={dimensions.height}
-        className="absolute top-0 left-0 h-full w-full"
+        className="absolute left-0 top-0 h-full w-full"
       />
-      
+
       {/* SVG for paths and interaction */}
       <svg
         ref={svgRef}
         width={dimensions.width}
         height={dimensions.height}
-        className="absolute top-0 left-0 h-full w-full"
+        className="absolute left-0 top-0 h-full w-full"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -1051,17 +1135,20 @@ const Background: React.FC = () => {
         {/* Animation paths are created by requestAnimationFrame */}
 
         {/* Render permanent drawing paths */}
-        {paths.filter(path => path && path.d).map((path) => (
-          <path
-            key={path.id}
-            d={path.d}
-            stroke={path.color}
-            strokeWidth={path.width}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        ))}
+        {paths
+          .filter((path) => path && path.d)
+          .map((path) => (
+            <path
+              key={path.id}
+              d={path.d}
+              stroke={path.color}
+              strokeWidth={path.width}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeOpacity="1"
+              fill="none"
+            />
+          ))}
 
         {/* Render temporary path during drawing */}
         {currentPath && currentPath.d && (
@@ -1078,16 +1165,16 @@ const Background: React.FC = () => {
 
         {/* Render only visible dots */}
         {dotGrid.map(
-            (dot) =>
-                !isDotCovered(dot.id) && (
-                    <circle
-                        key={dot.id}
-                        cx={dot.x}
-                        cy={dot.y}
-                        r={dotRadius}
-                        fill="#666"
-                    />
-                ),
+          (dot) =>
+            !isDotCovered(dot.id) && (
+              <circle
+                key={dot.id}
+                cx={dot.x}
+                cy={dot.y}
+                r={dotRadius}
+                fill="#666"
+              />
+            ),
         )}
       </svg>
 

@@ -11,7 +11,7 @@ export function ThemeSwitcher() {
   return (
     <>
       <button
-        className="h-11 w-11 border-2 border-border bg-white p-0 dark:border-darkBorder dark:bg-darkBg"
+        className="h-11 w-11  bg-transparent "
         onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
       >
         <Sun className="hidden h-6 w-6 stroke-darkText dark:inline" />

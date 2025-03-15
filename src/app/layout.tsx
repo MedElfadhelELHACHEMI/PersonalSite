@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from './theme-provider'
 import NavBar from '@/components/NavBar'
 import Background from '@/components/Background'
+import { cn } from '@/lib/utils'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -15,8 +16,16 @@ export const metadata: Metadata = {
     template: '%s | Mohamed Hachemi',
     default: 'Mohamed Hachemi | Senior Frontend Developer',
   },
-  description: 'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices. Specializing in design systems, performance optimization, and leading cross-functional projects.',
-  keywords: ['frontend developer', 'React developer', 'Next.js developer', 'Paris developer', 'UI/UX', 'design systems'],
+  description:
+    'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices. Specializing in design systems, performance optimization, and leading cross-functional projects.',
+  keywords: [
+    'frontend developer',
+    'React developer',
+    'Next.js developer',
+    'Paris developer',
+    'UI/UX',
+    'design systems',
+  ],
   authors: [{ name: 'Mohamed Hachemi' }],
   creator: 'Mohamed Hachemi',
   openGraph: {
@@ -24,13 +33,15 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://mohamed-hachemi.com',
     title: 'Mohamed Hachemi | Senior Frontend Developer',
-    description: 'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices.',
+    description:
+      'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices.',
     siteName: 'Mohamed Hachemi Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mohamed Hachemi | Senior Frontend Developer',
-    description: 'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices.',
+    description:
+      'Senior frontend developer with 6+ years of expertise in React, Next.js, and modern UI/UX practices.',
   },
   robots: {
     index: true,
@@ -45,9 +56,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={montserrat.className}>
-        <Background />
+      <body className={cn(montserrat.className, 'cursor-[--cursor]')}>
         <ThemeProvider defaultTheme="dark" attribute="class">
+          <Background />
           {/* Navbar container */}
           <header className="relative z-20">
             <div className="flex flex-row justify-end">
@@ -56,9 +67,7 @@ export default function RootLayout({
           </header>
 
           {/* Main content */}
-          <main className="relative z-10">
-            {children}
-          </main>
+          <main className="relative z-10">{children}</main>
         </ThemeProvider>
         <div className="noise-gradient"></div>
       </body>

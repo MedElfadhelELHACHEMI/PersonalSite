@@ -18,6 +18,7 @@ const config: Config = {
   			darkText: '#eeefe9',
   			darkBorder: '#000',
   			secondaryBlack: '#212121',
+        lightBg: '#FEFEFE',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -106,6 +107,6 @@ const config: Config = {
   	}
   },
   plugins: [require("tailwindcss-animate")],
-  darkMode: ['class', 'class'],
+  darkMode: ['class'],
 }
 export default config

@@ -13,6 +13,11 @@ body {
   --sb-thumb-color: #000000;
 }
 
+body.dark {
+  --sb-track-color: #333333;
+  --sb-thumb-color: #000000;
+}
+
 body::-webkit-scrollbar {
   width: 16px;
 }
@@ -49,7 +54,7 @@ body::-webkit-scrollbar-thumb {
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
+    --border: 0 0% 0%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --chart-1: 12 76% 61%;
@@ -58,6 +63,7 @@ body::-webkit-scrollbar-thumb {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --cursor: url('../../public/pencil-black.svg'), auto;
   }
   .dark {
     --background: 0 0% 13%;
@@ -84,6 +90,7 @@ body::-webkit-scrollbar-thumb {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --cursor: url('../../public/pencil-white.svg'), auto;
   }
 }
 
@@ -92,9 +99,11 @@ body::-webkit-scrollbar-thumb {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-lightBg text-foreground dark:bg-secondaryBlack dark:text-white ;
+    transition: background-color 0.62s ease;
   }
 }
+
 body {
   /*background-image: radial-gradient(*/
   /*  rgba(128, 128, 128, 0.5) 1px,*/
@@ -102,7 +111,7 @@ body {
   /*);*/
   /*background-size: 16px 16px;*/
   padding: 32px;
-  cursor: url('../../public/pencil.svg'), auto;
+
 }
 .noise-gradient {
   position: fixed;

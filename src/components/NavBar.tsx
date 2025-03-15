@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/navigation-menu'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ThemeSwitcher } from '@/app/theme-switcher'
 
 export default function NavBar() {
   const pathname = usePathname()
@@ -23,7 +24,7 @@ export default function NavBar() {
   ]
 
   return (
-    <NavigationMenu className="navbar mr-9 mt-4 bg-transparent">
+    <NavigationMenu className="navbar mr-9 mt-4 border-transparent bg-transparent dark:border-transparent ">
       <NavigationMenuList className="gap-3">
         {navItems.map((item) => (
           <NavigationMenuItem key={item.path} className="bg-transparent">
@@ -31,8 +32,8 @@ export default function NavBar() {
               <NavigationMenuLink
                 className={cn(
                   navigationMenuTriggerStyle(),
-                  'bg-transparent text-white transition-all duration-200',
-                  pathname === item.path && 'font-bold underline'
+                  'bg-transparent text-text transition-all duration-200 dark:text-white',
+                  pathname === item.path && 'font-bold underline',
                 )}
               >
                 {item.name}
@@ -41,19 +42,19 @@ export default function NavBar() {
           </NavigationMenuItem>
         ))}
         <NavigationMenuItem>
-          <Button 
-            variant="default" 
-            asChild
-          >
-            <a 
-              href="../../public/RESUME_MOHAMED_HACHEMI.pdf"
-              target="_blank" 
+          <Button variant="default" asChild>
+            <a
+              href="/Resume_Mohamed_Hachemi.pdf"
+              target="_blank"
               rel="noopener noreferrer"
               download
             >
               Resume
             </a>
           </Button>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <ThemeSwitcher />
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
