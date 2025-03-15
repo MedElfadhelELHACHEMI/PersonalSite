@@ -96,12 +96,13 @@ body::-webkit-scrollbar-thumb {
   }
 }
 body {
-  background-image: radial-gradient(
-    rgba(128, 128, 128, 0.5) 1px,
-    rgba(0, 0, 0, 0) 0px
-  );
-  background-size: 16px 16px;
+  /*background-image: radial-gradient(*/
+  /*  rgba(128, 128, 128, 0.5) 1px,*/
+  /*  rgba(0, 0, 0, 0) 0px*/
+  /*);*/
+  /*background-size: 16px 16px;*/
   padding: 32px;
+  cursor: url('../../public/pencil.svg'), auto;
 }
 .noise-gradient {
   position: fixed;

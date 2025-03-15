@@ -1,3 +1,7 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -5,52 +9,51 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-import Link from 'next/link'
-import { twMerge } from 'tailwind-merge'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function NavBar() {
+  const pathname = usePathname()
+
+  // Navigation items with their paths
+  const navItems = [
+    { name: 'About', path: '/' },
+    { name: 'Projects', path: '/projects' },
+    { name: 'Experience', path: '/experience' },
+  ]
+
   return (
-    <NavigationMenu className="navbar mr-9 bg-transparent">
+    <NavigationMenu className="navbar mr-9 mt-4 bg-transparent">
       <NavigationMenuList className="gap-3">
-        <NavigationMenuItem className="bg-transparent">
-          <Link href="/" legacyBehavior passHref>
-            <NavigationMenuLink
-              className={twMerge(
-                navigationMenuTriggerStyle(),
-                'bg-transparent text-white',
-              )}
-            >
-              About
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
+        {navItems.map((item) => (
+          <NavigationMenuItem key={item.path} className="bg-transparent">
+            <Link href={item.path} legacyBehavior passHref>
+              <NavigationMenuLink
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  'bg-transparent text-white transition-all duration-200',
+                  pathname === item.path && 'font-bold underline'
+                )}
+              >
+                {item.name}
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        ))}
         <NavigationMenuItem>
-          <Link href="/projects" legacyBehavior passHref>
-            <NavigationMenuLink
-              className={twMerge(
-                navigationMenuTriggerStyle(),
-                'bg-transparent text-white',
-              )}
+          <Button 
+            variant="default" 
+            asChild
+          >
+            <a 
+              href="../../public/RESUME_MOHAMED_HACHEMI.pdf"
+              target="_blank" 
+              rel="noopener noreferrer"
+              download
             >
-              Projects
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link href="/experience" legacyBehavior passHref>
-            <NavigationMenuLink
-              className={twMerge(
-                navigationMenuTriggerStyle(),
-                'bg-transparent text-white',
-              )}
-            >
-              Experience
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Button>Resume</Button>
+              Resume
+            </a>
+          </Button>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
