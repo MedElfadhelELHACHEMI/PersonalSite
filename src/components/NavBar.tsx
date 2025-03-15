@@ -44,7 +44,7 @@ export default function NavBar() {
         <NavigationMenuItem>
           <Button variant="default" asChild>
             <a
-              href="/Resume_Mohamed_Hachemi.pdf"
+              href="/RESUME_MOHAMED_HACHEMI.pdf"
               target="_blank"
               rel="noopener noreferrer"
               download
