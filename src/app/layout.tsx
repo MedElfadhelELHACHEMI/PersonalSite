@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 import React from 'react'
+import { Analytics } from '@vercel/analytics/react'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -60,6 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(montserrat.className, 'cursor-[--cursor]')}>
+        <Analytics />
         <ThemeProvider defaultTheme="dark" attribute="class">
           <Background />
           {/* Navbar container */}
