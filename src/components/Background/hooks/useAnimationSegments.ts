@@ -70,7 +70,7 @@ export const useAnimationSegments = (
       for (let i = 0; i < numLines; i++) {
         const startDot = getCentralDot()
         const points: Point[] = [startDot]
-        const segmentCount = Math.floor(Math.random() * 4) + 7 // 4-7 segments
+        const segmentCount = Math.floor(Math.random() * 4) + 5 // 4-7 segments
 
         let currentPoint = startDot
         for (let j = 0; j < segmentCount; j++) {

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { PathData, Point } from '../types'
 import { findNearestDotGridAligned } from '../utils/pathUtils'
 import { generatePathFromPoints } from '../utils/pathUtils'
@@ -27,9 +27,11 @@ export const useDrawing = (
   setIsDrawing: (value: boolean) => void,
   setStartDot: (value: Point | null) => void,
   setCurrentPoints: (value: Point[]) => void,
-  setCurrentPath: (updater: ((prev: PathData | null) => PathData | null) | PathData | null) => void,
-  setCoveredDots: (updater: (prev: Set<string>) => Set<string>) => void,
-  setPaths: (updater: (prev: PathData[]) => PathData[]) => void
+  setCurrentPath: (
+    updater: ((prev: PathData | null) => PathData | null) | PathData | null,
+  ) => void,
+  setCoveredDots: React.Dispatch<React.SetStateAction<Set<string>>>,
+  setPaths: React.Dispatch<React.SetStateAction<PathData[]>>,
 ) => {
   // Refs for better performance
   const isDrawingRef = useRef<boolean>(false)
@@ -42,7 +44,7 @@ export const useDrawing = (
     (row: number, col: number): Point => {
       return createDotAt(row, col, dotSpacing)
     },
-    [dotSpacing]
+    [dotSpacing],
   )
 
   // Throttled mouse move handler to reduce render cycles
@@ -65,7 +67,7 @@ export const useDrawing = (
           lastPoint,
           dotSpacing,
           dimensions,
-          getDotAt
+          getDotAt,
         )
 
         if (
@@ -97,7 +99,7 @@ export const useDrawing = (
                   d: pathData,
                   points: newPoints,
                 }
-              : null
+              : null,
           )
 
           // Mark the dot as covered
@@ -131,7 +133,14 @@ export const useDrawing = (
         console.error('Error in throttled mouse move:', error)
       }
     }, 16), // Throttle to ~60fps
-    [dimensions, dotSpacing, getDotAt, setCurrentPoints, setCurrentPath, setCoveredDots]
+    [
+      dimensions,
+      dotSpacing,
+      getDotAt,
+      setCurrentPoints,
+      setCurrentPath,
+      setCoveredDots,
+    ],
   )
 
   // Start drawing at a specific point
@@ -195,7 +204,7 @@ export const useDrawing = (
       setCurrentPoints,
       setCurrentPath,
       setCoveredDots,
-    ]
+    ],
   )
 
   // End drawing and finalize the path
