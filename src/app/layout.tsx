@@ -5,6 +5,9 @@ import { ThemeProvider } from './theme-provider'
 import NavBar from '@/components/NavBar'
 import Background from '@/components/Background'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { ExternalLink } from 'lucide-react'
+import React from 'react'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -70,6 +73,18 @@ export default function RootLayout({
           <main className="relative z-10">{children}</main>
         </ThemeProvider>
         <div className="noise-gradient"></div>
+        <footer className="pointer-events-all fixed bottom-0 left-0 flex flex-row items-center gap-1 rounded bg-black bg-opacity-70 p-2 text-xs text-white opacity-30 transition-opacity hover:opacity-100">
+          <p>Coded using Webstorm and Claude, inspired by</p>
+          <Link
+            href="https://www.neobrutalism.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1"
+          >
+            Neobrutalism.dev
+            <ExternalLink size={16} />
+          </Link>
+        </footer>
       </body>
     </html>
   )
