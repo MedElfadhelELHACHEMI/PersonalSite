@@ -65,7 +65,15 @@ export const useMouseHandlers = (
       try {
         // Ignore clicks on interactive elements
         const target = e.target as HTMLElement
-        if (target.closest('.interactive-element')) {
+        
+        // Check if the click is on an interactive element, footer, or any of its children
+        if (
+          target.closest('.interactive-element') || 
+          target.closest('.footer-link') ||
+          target.closest('a[href="https://www.neobrutalism.dev"]') || // Exact footer link
+          target.tagName === 'A' || // Any anchor element
+          target.closest('footer') // Any footer element
+        ) {
           return
         }
 

@@ -53,7 +53,7 @@ const Background: React.FC = () => {
   const [currentPoints, setCurrentPoints] = useState<Point[]>([])
   const [startDot, setStartDot] = useState<Point | null>(null)
   const [coveredDots, setCoveredDots] = useState<Set<string>>(new Set())
-  
+
   // Animation state
   const [animationComplete, setAnimationComplete] = useState(false)
   const [animationSegments, setAnimationSegments] = useState<any[]>([])
@@ -63,21 +63,21 @@ const Background: React.FC = () => {
 
   // Generate virtualized dot grid - only dots in or near the viewport
   const dotGrid = useMemo(
-    () => 
+    () =>
       generateDotGrid(
-        dimensions, 
-        viewport, 
-        CONSTANTS.dotSpacing, 
-        CONSTANTS.viewportMargin
+        dimensions,
+        viewport,
+        CONSTANTS.dotSpacing,
+        CONSTANTS.viewportMargin,
       ),
-    [dimensions, viewport]
+    [dimensions, viewport],
   )
 
   // Initialize animation segments hooks
   const { createAnimationSegments, getDotAt } = useAnimationSegments(
     dimensions,
     CONSTANTS.dotSpacing,
-    getRandomColor
+    getRandomColor,
   )
 
   // Initialize canvas drawing hook
@@ -85,7 +85,7 @@ const Background: React.FC = () => {
     canvasRef,
     dotGrid,
     coveredDots,
-    CONSTANTS.dotRadius
+    CONSTANTS.dotRadius,
   )
 
   // Initialize animation hook
@@ -95,27 +95,23 @@ const Background: React.FC = () => {
     CONSTANTS.lineWidth,
     setAnimationComplete,
     setPaths,
-    setCoveredDots
+    setCoveredDots,
   )
 
   // Initialize drawing hook
-  const {
-    startDrawing,
-    endDrawing,
-    clearDrawing,
-    handleThrottledMouseMove,
-  } = useDrawing(
-    dimensions,
-    CONSTANTS.dotSpacing,
-    CONSTANTS.lineWidth,
-    getRandomColor,
-    setIsDrawing,
-    setStartDot,
-    setCurrentPoints,
-    setCurrentPath,
-    setCoveredDots,
-    setPaths
-  )
+  const { startDrawing, endDrawing, clearDrawing, handleThrottledMouseMove } =
+    useDrawing(
+      dimensions,
+      CONSTANTS.dotSpacing,
+      CONSTANTS.lineWidth,
+      getRandomColor,
+      setIsDrawing,
+      setStartDot,
+      setCurrentPoints,
+      setCurrentPath,
+      setCoveredDots,
+      setPaths,
+    )
 
   // Initialize mouse handlers
   const {
@@ -132,17 +128,18 @@ const Background: React.FC = () => {
     handleThrottledMouseMove,
     endDrawing,
     clearDrawing,
-    CONSTANTS.dotSpacing
+    CONSTANTS.dotSpacing,
   )
 
   // Initialize event handlers
-  const { setupDocumentMouseDown, setupActiveDrawingHandlers } = useEventHandlers(
-    setDimensions,
-    setViewport,
-    canvasRef,
-    drawDotsOnCanvas,
-    clearDrawing
-  )
+  const { setupDocumentMouseDown, setupActiveDrawingHandlers } =
+    useEventHandlers(
+      setDimensions,
+      setViewport,
+      canvasRef,
+      drawDotsOnCanvas,
+      clearDrawing,
+    )
 
   // Update covered dots when a new path is added
   useEffect(() => {
@@ -156,7 +153,7 @@ const Background: React.FC = () => {
     if (!latestPath || !latestPath.points) return
 
     // Update covered dots
-    setCoveredDots(prevCovered => updateCoveredDots(latestPath, prevCovered))
+    setCoveredDots((prevCovered) => updateCoveredDots(latestPath, prevCovered))
   }, [paths])
 
   // Setup document-wide mouse event listeners
@@ -184,7 +181,11 @@ const Background: React.FC = () => {
 
   // Set up animation segments
   useEffect(() => {
-    if (!animationComplete && dotGrid.length > 0 && animationSegments.length === 0) {
+    if (
+      !animationComplete &&
+      dotGrid.length > 0 &&
+      animationSegments.length === 0
+    ) {
       try {
         const segments = createAnimationSegments()
         if (segments && segments.length > 0) {
@@ -220,7 +221,7 @@ const Background: React.FC = () => {
       backgroundColor: theme === 'light' ? '#EDEADE' : 'rgb(33, 33, 33)',
       transition: 'background-color 0.62s ease',
     }),
-    [theme]
+    [theme],
   )
 
   // Check if a dot is covered by a line
@@ -294,12 +295,12 @@ const Background: React.FC = () => {
                 r={CONSTANTS.dotRadius}
                 fill="#666"
               />
-            )
+            ),
         )}
       </svg>
 
       {/* Hidden info text */}
-      <div className="absolute bottom-5 right-5 rounded bg-black bg-opacity-70 p-2 text-xs text-white opacity-30 transition-opacity hover:opacity-100">
+      <div className="interactive-element absolute bottom-5 right-5 rounded bg-black bg-opacity-70 p-2 text-xs text-white opacity-30 transition-opacity hover:opacity-100">
         Double-click to clear | Press C to clear
       </div>
     </div>
