@@ -33,7 +33,7 @@ export function TimelineItem({ experience, isLast }: TimelineItemProps) {
       </div>
 
       <div className="w-full">
-        <Card className="pointer-events-auto flex h-full w-full flex-col bg-stone-50 text-text dark:bg-[rgb(33,33,33)] dark:text-white">
+        <Card className="user-select-none pointer-events-auto flex h-full w-full flex-col bg-stone-50 text-text dark:bg-neutral-800 dark:text-white">
           <CardHeader>
             <div className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
               <CardTitle className="text-xl font-bold text-text dark:text-white">
@@ -63,7 +63,7 @@ export function TimelineItem({ experience, isLast }: TimelineItemProps) {
               ))}
             </div>
           </CardContent>
-          <CardFooter className="border-t border-border pt-4 dark:border-darkBorder">
+          <CardFooter className="border-t border-border bg-zinc-200 pt-4 dark:border-darkBorder dark:bg-neutral-900">
             <Button variant="default" className="ml-auto" asChild>
               <Link
                 href={experience.link}
