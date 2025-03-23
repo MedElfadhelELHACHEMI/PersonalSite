@@ -17,6 +17,7 @@ import { useAnimation } from './hooks/useAnimation'
 import { useDrawing } from './hooks/useDrawing'
 import { useEventHandlers } from './hooks/useEventHandlers'
 import { useMouseHandlers } from './hooks/useMouseHandlers'
+import { usePathname } from 'next/navigation'
 
 // Constants for the background component
 const CONSTANTS = {
@@ -29,6 +30,7 @@ const CONSTANTS = {
 
 const Background: React.FC = () => {
   const { theme } = useTheme()
+  const pathname = usePathname()
 
   // Refs for DOM elements
   const svgRef = useRef<SVGSVGElement>(null)
@@ -205,10 +207,14 @@ const Background: React.FC = () => {
 
   // Start animation when segments are ready
   useEffect(() => {
-    if (animationSegments.length > 0 && !animationComplete) {
+    if (
+      animationSegments.length > 0 &&
+      !animationComplete &&
+      pathname !== '/draw'
+    ) {
       return runInitialAnimation()
     }
-  }, [animationSegments, animationComplete, runInitialAnimation])
+  }, [animationSegments, animationComplete, runInitialAnimation, pathname])
 
   // Update canvas when dot grid or covered dots change
   useEffect(() => {

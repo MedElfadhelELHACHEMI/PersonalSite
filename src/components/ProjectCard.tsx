@@ -28,7 +28,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   } as const
 
   return (
-    <Card className="user-select-none pointer-events-none flex h-full flex-col bg-stone-50 text-text dark:bg-neutral-800 dark:text-white">
+    <Card className="user-select-none pointer-events-auto flex h-full flex-col bg-stone-50 text-text dark:bg-neutral-800 dark:text-white">
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="text-xl font-bold text-text dark:text-white">
@@ -57,9 +57,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
           ))}
         </div>
       </CardContent>
-      <CardFooter className="border-t border-border bg-zinc-200 pt-4 dark:border-darkBorder dark:bg-neutral-900">
+      <CardFooter className="interactive-element border-t border-border bg-zinc-200 pt-4 dark:border-darkBorder dark:bg-neutral-900">
         <Button variant="default" className="ml-auto" asChild>
-          <Link href={project.link} target="_blank" rel="noopener noreferrer">
+          <Link
+            className="footer-link interactive-element"
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <ExternalLink size={16} />
             Learn More
           </Link>

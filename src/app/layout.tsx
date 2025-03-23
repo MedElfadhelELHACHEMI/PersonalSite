@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 import React from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import { useRouter } from 'next/router'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -57,6 +58,7 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
+  params: Record<string, unknown>
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -75,11 +77,11 @@ export default function RootLayout({
           <main className="relative z-10">{children}</main>
         </ThemeProvider>
         <div className="noise-gradient"></div>
-        <Link 
+        <Link
           href="https://www.neobrutalism.dev"
           target="_blank"
           rel="noopener noreferrer"
-          className="footer-link interactive-element pointer-events-auto fixed bottom-0 left-0 z-30 flex flex-row items-center gap-1 rounded bg-black bg-opacity-70 p-2 text-xs text-white opacity-30 transition-opacity hover:opacity-100 hover:underline"
+          className="footer-link interactive-element pointer-events-auto fixed bottom-0 left-0 z-30 flex flex-row items-center gap-1 rounded bg-black bg-opacity-70 p-2 text-xs text-white opacity-30 transition-opacity hover:underline hover:opacity-100"
         >
           <p>Coded using Webstorm and Claude, inspired by Neobrutalism.dev</p>
           <ExternalLink size={16} />
